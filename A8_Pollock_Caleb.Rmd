@@ -1,0 +1,83 @@
+---
+title: "A8_Pollock_Caleb"
+output: html_document
+date: "2023-03-08"
+---
+
+https://github.com/caleb-pollock/BIOL432_Assignment8
+
+Begin by importing the data and observe the structure and head of the data.
+
+```{r}
+library(vegan)
+library(ape)
+library(ggtree)
+library(ggplot2)
+
+# Import the data
+Samples <- read.csv("./data/FloristicSurvey.csv", header = T)
+Samples$Population <- as.factor(Samples$Population)
+str(Samples)
+head(Samples)
+```
+```{r}
+
+# Create a subset of the data that only includes the abundance of each species
+abunDat <- Samples[,11:41]
+View(abunDat)
+
+# Convert all of that data to binary
+binDat <- ifelse(abunDat==0,0,1)
+View(binDat)
+```
+
+```{r}
+# Calculate the bray-curtis dissimilarity matrix.
+
+DissMat <- vegdist(binDat, method = "bray")
+
+# Preform nmds 
+set.seed(13)
+NMDSdat <- metaMDS(DissMat, k=2, trymax = 100)
+```
+
+```{r}
+# Create a plot and group by Budding
+
+ggplot(Samples, aes(x=NMDSdat$points[,1], y=NMDSdat$points[,2], colour=Budding)) +
+  geom_point() +
+  labs(x="NMDS 1", y="NMDS 2", title="NMDS of Garlics Mustards affects on Plant Community by Budding") +
+  theme_bw()
+```
+
+Figure 1: A NMDS analysis to determine what effects garlic mustard has on plant community. Colour seperated by budding level data was collected from. 
+
+1. What effect (if any) does garlic mustard have on the plant community?
+
+  Garlic mustards effects on plant community does not appear to have an effect on plant community. From observing the figure, there is not concentration of points which would indicate that the presence of garlic mustard is harming the plant community. Additionally, the plot is coloured by budding of garlic mustard, which would indicate the level of garlic mustard in any given quadrant. There is no discernible relationship between level of budding and harm to plant communities.
+  
+```{r}
+# Create a plot and group by location 
+
+ggplot(Samples, aes(x=NMDSdat$points[,1], y=NMDSdat$points[,2], colour=Location)) +
+  geom_point() +
+  labs(x="NMDS 1", y="NMDS 2", title="NMDS of Garlics Mustards affects on Plant Community by Location") +
+  theme_bw()
+```
+
+Figure 2: A NMDS analysis to determine what effects garlic mustard has on plant community. Colour seperated by location data was collected from.
+
+```{r}
+# Create a plot and group sampling population
+
+ggplot(Samples, aes(x=NMDSdat$points[,1], y=NMDSdat$points[,2], colour=Population)) +
+  geom_point() +
+  labs(x="NMDS 1", y="NMDS 2", title="NMDS of Garlics Mustards affects on Plant Community by Population ") +
+  theme_bw()
+```
+
+Figure 3: A NMDS analysis to determine what effects garlic mustard has on plant community. Colour seperated by population data was collected from.  
+  
+2. What a stronger effect on plant communities: the presence/absence of garlic mustard (in/out) or sampling population?
+
+  Creating plots which seperate the NMDS data for both presence/absence of garlic mustard as well as sampling populatons, it is much more likely that sampling population has a stronger effect on plant communities. This is due to a much higher level of grouping of traits observed when sorting the plot by sampling population compared to sorting by location.
